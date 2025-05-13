@@ -27,7 +27,7 @@ const Home = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-6">Produtos em Tempo Real</h1>
+      <h1 className="text-3xl font-bold text-center mb-6">Bikes Disponíveis</h1>
 
       <div className="flex flex-wrap justify-center gap-6">
         {produtos.length === 0 ? (
