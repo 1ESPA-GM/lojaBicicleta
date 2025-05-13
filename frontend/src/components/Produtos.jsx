@@ -5,18 +5,18 @@ const Produtos = () => {
   const API_URL = 'http://localhost:3000/produtos'
 
   const [produtos, setProdutos] = useState([])
-  const [novoProduto, setNovoProduto] = useState({ nome: '', descricao: '', descricao2: '', imagem: '' })
+  const [novoProduto, setNovoProduto] = useState({ nome: '', descricao: '', preco: '', imagem: '' })
   const [editar, setEditar] = useState(false)
 
   const cadastrarProduto = async () => {
-    if (!novoProduto.nome || !novoProduto.descricao || !novoProduto.descricao2) {
+    if (!novoProduto.nome || !novoProduto.descricao || !novoProduto.preco || !novoProduto.imagem) {
       alert('Todos os campos são obrigatórios')
       return
     }
     try {
       const response = await axios.post(API_URL, novoProduto)
       setProdutos([...produtos, response.data])
-      setNovoProduto({ nome: '', descricao: '', descricao2: '' })
+      setNovoProduto({ nome: '', descricao: '', preco: '', imagem: '' })
       setEditar(false)
     } catch (error) {
       console.log('Erro ao criar o produto', error)
@@ -37,14 +37,14 @@ const Produtos = () => {
   }
 
   const alterarProduto = async () => {
-    if (!novoProduto.nome || !novoProduto.descricao || !novoProduto.descricao2) {
+    if (!novoProduto.nome || !novoProduto.descricao || !novoProduto.preco || !novoProduto.imagem) {
       alert('Todos os campos são obrigatórios')
       return
     }
     try {
       const response = await axios.put(`${API_URL}/${novoProduto.id}`, novoProduto)
       setProdutos(produtos.map((produto) => (produto.id === novoProduto.id ? response.data : produto)))
-      setNovoProduto({ nome: '', descricao: '', descricao2: '' })
+      setNovoProduto({ nome: '', descricao: '', preco: '', imagem: '' })
       setEditar(false)
     } catch (error) {
       console.log('Erro ao atualizar o produto', error)
@@ -65,7 +65,13 @@ const Produtos = () => {
   }
 
   const handleEditar = (produto) => {
-    setNovoProduto(produto)
+    setNovoProduto({
+      id: produto.id,
+      nome: produto.nome,
+      descricao: produto.descricao,
+      preco: produto.preco,
+      imagem: produto.imagem,
+    })
     setEditar(true)
   }
 
@@ -79,72 +85,89 @@ const Produtos = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Cadastro de Produtos</h1>
-      <form className="mb-4" onSubmit={handleSubmit}>
-        <div className="mb-2">
-          <label htmlFor="nome" className="block text-sm font-medium text-gray-700">Nome</label>
-          <input
-            type="text"
-            id="nome"
-            placeholder="Nome"
-            value={novoProduto.nome}
-            onChange={(e) => setNovoProduto({ ...novoProduto, nome: e.target.value })}
-            className="mt-1 p-2 border rounded w-full"
-          />
-        </div>
-        <div className="mb-2">
-          <label htmlFor="descricao" className="block text-sm font-medium text-gray-700">Descrição</label>
-          <input
-            type="text"
-            id="descricao"
-            placeholder="Descrição"
-            value={novoProduto.descricao}
-            onChange={(e) => setNovoProduto({ ...novoProduto, descricao: e.target.value })}
-            className="mt-1 p-2 border rounded w-full"
-          />
-        </div>
-        <div className="mb-2">
-          <label htmlFor="descricao2" className="block text-sm font-medium text-gray-700">Preço</label>
-          <input
-            type="text"
-            id="descricao2"
-            placeholder="Preço em R$"
-            value={novoProduto.descricao2}
-            onChange={(e) => setNovoProduto({ ...novoProduto, descricao2: e.target.value })}
-            className="mt-1 p-2 border rounded w-full"
-          />
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      {/* FORMULÁRIO */}
+      <form 
+        onSubmit={handleSubmit} 
+        className="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mb-10 grid gap-4"
+      >
+        <h2 className="text-2xl font-bold text-center">
+          {editar ? 'Editar Produto' : 'Cadastrar Produto'}
+        </h2>
+
+        <input
+          type="text"
+          placeholder="Nome"
+          value={novoProduto.nome}
+          onChange={(e) => setNovoProduto({ ...novoProduto, nome: e.target.value })}
+          className="p-2 border rounded w-full"
+        />
+
+        <input
+          type="text"
+          placeholder="Descrição"
+          value={novoProduto.descricao}
+          onChange={(e) => setNovoProduto({ ...novoProduto, descricao: e.target.value })}
+          className="p-2 border rounded w-full"
+        />
+
+        <input
+          type="text"
+          placeholder="Preço (R$)"
+          value={novoProduto.preco}
+          onChange={(e) => setNovoProduto({ ...novoProduto, preco: e.target.value })}
+          className="p-2 border rounded w-full"
+        />
+
+        <input
+          type="text"
+          placeholder="URL da imagem (opcional)"
+          value={novoProduto.imagem}
+          onChange={(e) => setNovoProduto({ ...novoProduto, imagem: e.target.value })}
+          className="p-2 border rounded w-full"
+        />
+
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded"
         >
-          {editar ? 'Alterar' : 'Cadastrar'}
+          {editar ? 'Salvar Alterações' : 'Cadastrar Produto'}
         </button>
       </form>
-      <ul>
+
+      {/* LINHA DE PRODUTOS COM IMAGENS PEQUENAS */}
+      <div className="flex flex-wrap justify-center gap-6">
         {produtos.map((produto) => (
-          <li key={produto.id} className="border p-2 mb-2 rounded flex items-center justify-between">
-            <div>
-              <strong className="font-semibold"> <img src="/bike01.webp" alt="bicicleta" width={250} /> {produto.nome}</strong> - {produto.descricao} - R$ {produto.descricao2}
-            </div>
-            <div>
+          <div 
+            key={produto.id} 
+            className="w-52 bg-white shadow-md rounded-lg p-4 flex flex-col items-center"
+          >
+            <img 
+              src={produto.imagem || '/bike01.webp'} 
+              alt={produto.nome} 
+              className="w-24 h-24 object-cover rounded mb-3"
+            />
+            <h3 className="text-md font-bold text-center">{produto.nome}</h3>
+            <p className="text-sm text-gray-600 text-center">{produto.descricao}</p>
+            <p className="text-green-600 font-semibold text-sm mt-1">R$ {produto.preco}</p>
+
+            <div className="flex gap-2 mt-3">
               <button
                 onClick={() => handleEditar(produto)}
-                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded mr-2"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-semibold py-1 px-2 rounded"
               >
                 Editar
               </button>
               <button
                 onClick={() => deletaProduto(produto.id)}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                className="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-1 px-2 rounded"
               >
                 Deletar
               </button>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

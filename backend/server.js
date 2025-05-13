@@ -13,13 +13,13 @@ let produtos = []
 
 // CREATE
 app.post('/produtos', (req, res) => {
-    const { nome, descricao, descricao2 } = req.body
+    const { nome, descricao, preco, imagem } = req.body
 
-    if (!nome || !descricao || !descricao2) {
+    if (!nome || !descricao || !preco || !imagem) {
         return res.status(400).json({ error: 'Todos os campos são obrigatórios.' })
     }
 
-    const novoItem = { id: uuid(), nome, descricao, descricao2 }
+    const novoItem = { id: uuid(), nome, descricao, preco, imagem }
     produtos.push(novoItem)
     res.status(201).json(novoItem)
 })
@@ -32,9 +32,9 @@ app.get('/produtos', (req, res) => {
 // UPDATE
 app.put('/produtos/:id', (req, res) => {
     const produtoId = req.params.id
-    const { nome, descricao, descricao2 } = req.body
+    const { nome, descricao, preco, imagem } = req.body
 
-    if (!nome || !descricao || !descricao2) {
+    if (!nome || !descricao || !preco || !imagem) {
         return res.status(400).json({ error: 'Todos os campos são obrigatórios.' })
     }
 
@@ -43,7 +43,7 @@ app.put('/produtos/:id', (req, res) => {
         return res.status(404).json({ error: 'Produto não encontrado.' })
     }
 
-    produtos[produtoIndex] = { id: produtoId, nome, descricao, descricao2 }
+    produtos[produtoIndex] = { id: produtoId, nome, descricao, preco, imagem }
     res.json(produtos[produtoIndex])
 })
 
